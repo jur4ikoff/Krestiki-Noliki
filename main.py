@@ -77,17 +77,24 @@ class MainWindow(QMainWindow):
         uic.loadUi('main_menu.ui', self)
         self.initUI()
         self.about_window = AboutWindow()
+        self.run()
 
     def about(self):
         self.about_window.show()
 
 
+def run():
+    if __name__ == '__main__':
+        app = QApplication(sys.argv)
+        ex = MainWindow()
+        ex.show()
+        sys.exit(app.exec())
+
+
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
     running = True
-    main_wnd = MainWindow()
     start_screen()
-    main_wnd.show()
+    run()
     # player, level_x, level_y = generate_level(load_level(name_lvl))
     while running:
         a = None
@@ -117,6 +124,5 @@ if __name__ == '__main__':
         pygame.display.flip()
         screen.fill((255, 255, 255))
     pygame.quit()
-    sys.exit(app.exec_())
 
 # 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
