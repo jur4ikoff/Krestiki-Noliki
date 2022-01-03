@@ -76,8 +76,9 @@ class MainWindow(QMainWindow):
         super().__init__()
         uic.loadUi('main_menu.ui', self)
         self.initUI()
-        self.about_window = AboutWindow()
-        self.run()
+
+    def initUI(self):
+        pass
 
     def about(self):
         self.about_window.show()
@@ -125,4 +126,4 @@ if __name__ == '__main__':
         screen.fill((255, 255, 255))
     pygame.quit()
 
-# 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
+# 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
