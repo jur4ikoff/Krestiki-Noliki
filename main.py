@@ -1,6 +1,7 @@
 import sys
 import pygame
 import os
+import Game as game
 import random
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QPainter, QColor, QPixmap
@@ -84,7 +85,7 @@ class MainWindow(QMainWindow):
         self.about_window.show()
 
 
-def run():
+def main_wnd():
     if __name__ == '__main__':
         app = QApplication(sys.argv)
         ex = MainWindow()
@@ -95,7 +96,8 @@ def run():
 if __name__ == '__main__':
     running = True
     start_screen()
-    run()
+    main_wnd()
+
     # player, level_x, level_y = generate_level(load_level(name_lvl))
     while running:
         a = None
