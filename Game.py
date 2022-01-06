@@ -24,11 +24,11 @@ class Board:
 
         self.move_now = 1
         self.cell_dict = {}
-        def_color_ind = 1
+        empty_cell = 0
         for i in range(self.width):
             for j in range(self.height):
                 cell_temp = i, j
-                self.cell_dict[cell_temp] = def_color_ind
+                self.cell_dict[cell_temp] = empty_cell
 
     # настройка внешнего вида
     def set_view(self, left, top, cell_size):
@@ -67,7 +67,8 @@ class Board:
         self.color_red = pygame.Color('Red')
         self.color_blue = pygame.Color('Blue')
 
-        cell_pressed = self.get_cell(event.pos)
+        self.cell_pressed = self.get_cell(event.pos)
+
         self.x_top_cell_pressed = self.left + self.cell_size * self.cell_x + self.width * 10
         self.y_top_cell_pressed = self.top + self.cell_size * self.cell_y + self.height * 10
         self.x_low_cell_pressed = self.left + self.cell_size * (self.cell_x) \
@@ -86,15 +87,15 @@ class Board:
         self.x_center = self.left + (self.cell_size * self.cell_x) + self.cell_size // 2
         self.y_center = self.top + (self.cell_size * self.cell_y) + self.cell_size // 2
 
-        if cell_pressed != 'None':
-            self.move_now += 1
-
-            if self.move_now % 2 == 0:
-                if cell_pressed != 'None':
+        print(self.cell_pressed)
+        if self.cell_pressed != 'None':
+            if self.cell_dict[self.cell_pressed] == 0:
+                self.move_now += 1
+                if self.move_now % 2 == 0:
                     self.draw_crest()
-            if self.move_now % 2 == 1:
-                if cell_pressed != 'None':
+                if self.move_now % 2 == 1:
                     self.draw_circ()
+        self.side_win = self.check_win()
 
     def draw_crest(self):
         pygame.draw.line(screen, self.color_red, (self.x_top_cell_pressed, self.y_top_cell_pressed),
@@ -102,9 +103,32 @@ class Board:
 
         pygame.draw.line(screen, self.color_red, (self.x_top_cell_pressed1, self.y_top_cell_pressed1),
                          (self.x_low_cell_pressed1, self.y_low_cell_pressed1), width=5)
+        self.cell_dict[self.cell_pressed] = 1
 
     def draw_circ(self):
         pygame.draw.circle(screen, self.color_blue, (self.x_center, self.y_center), 50, width=5)
+        self.cell_dict[self.cell_pressed] = 2
+
+    def check_win(self):
+        win_side = 0
+        if (self.cell_dict[0, 0] == self.cell_dict[1, 0] == self.cell_dict[2, 0] == 1) \
+                or (self.cell_dict[0, 0] == self.cell_dict[0, 1] == self.cell_dict[0, 2] == 1) \
+                or (self.cell_dict[0, 0] == self.cell_dict[1, 1] == self.cell_dict[2, 2] == 1) \
+                or (self.cell_dict[0, 2] == self.cell_dict[1, 1] == self.cell_dict[2, 0] == 1) \
+                or (self.cell_dict[0, 2] == self.cell_dict[1, 2] == self.cell_dict[2, 2] == 1) \
+                or (self.cell_dict[2, 2] == self.cell_dict[2, 1] == self.cell_dict[2, 0] == 1):
+            print('победa крестиков')
+            win_side = 1
+            return win_side
+        if (self.cell_dict[0, 0] == self.cell_dict[1, 0] == self.cell_dict[2, 0] == 2) \
+                or (self.cell_dict[0, 0] == self.cell_dict[0, 1] == self.cell_dict[0, 2] == 2) \
+                or (self.cell_dict[0, 0] == self.cell_dict[1, 1] == self.cell_dict[2, 2] == 2) \
+                or (self.cell_dict[0, 2] == self.cell_dict[1, 1] == self.cell_dict[2, 0] == 2) \
+                or (self.cell_dict[0, 2] == self.cell_dict[1, 2] == self.cell_dict[2, 2] == 2) \
+                or (self.cell_dict[2, 2] == self.cell_dict[2, 1] == self.cell_dict[2, 0] == 2):
+            print('победа ноликов')
+            win_side = 2
+            return win_side
 
     def get_click(self, mouse_pos):
         cell = self.get_cell(mouse_pos)
