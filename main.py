@@ -79,11 +79,37 @@ class MainWindow(QMainWindow):
         self.initUI()
 
     def initUI(self):
-        pass
+        self.pushButton_2.clicked.connect(self.btn2)
 
     def about(self):
         self.about_window.show()
 
+    def btn1(self):
+        self.enm = 0
+
+    def btn2(self):
+        self.enm = 1
+        self.start_game()
+
+    def start_game(self):
+        if __name__ == '__main__':
+            pygame.init()
+            pygame.display.set_caption('Крестики нолики')
+            size = width, height = 1280, 720
+            screen = pygame.display.set_mode(size)
+            board = game.Board(3, 3, screen, self.enm)
+            board.set_view(50, 10, 150)
+            running = True
+            while running:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        running = False
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        board.get_click(event.pos)
+                # screen.fill((0, 0, 0))
+                board.render(screen)
+                pygame.display.flip()
+                MainWindow.hide(self)
 
 def main_wnd():
     if __name__ == '__main__':
@@ -91,6 +117,9 @@ def main_wnd():
         ex = MainWindow()
         ex.show()
         sys.exit(app.exec())
+
+
+
 
 
 if __name__ == '__main__':

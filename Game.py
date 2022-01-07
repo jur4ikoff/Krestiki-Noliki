@@ -14,7 +14,8 @@ def load_image(name, colorkey=None):
 
 
 class Board:
-    def __init__(self, width, height):
+    def __init__(self, width, height, surface, enemy):
+        self.screen = surface
         self.width = width
         self.height = height
         self.board = [[0] * width for _ in range(height)]
@@ -22,6 +23,7 @@ class Board:
         self.left = 10
         self.cell_size = 30
 
+        self.enemy = enemy
         self.move_now = 1
         self.cell_dict = {}
         empty_cell = 0
@@ -67,7 +69,8 @@ class Board:
         self.color_red = pygame.Color('Red')
         self.color_blue = pygame.Color('Blue')
 
-        self.cell_pressed = self.get_cell(event.pos)
+        self.cell_pressed = cell
+        #self.cell_pressed = self.get_cell(event.pos)
 
         self.x_top_cell_pressed = self.left + self.cell_size * self.cell_x + self.width * 10
         self.y_top_cell_pressed = self.top + self.cell_size * self.cell_y + self.height * 10
@@ -98,15 +101,15 @@ class Board:
         self.side_win = self.check_win()
 
     def draw_crest(self):
-        pygame.draw.line(screen, self.color_red, (self.x_top_cell_pressed, self.y_top_cell_pressed),
+        pygame.draw.line(self.screen, self.color_red, (self.x_top_cell_pressed, self.y_top_cell_pressed),
                          (self.x_low_cell_pressed, self.y_low_cell_pressed), width=5)
 
-        pygame.draw.line(screen, self.color_red, (self.x_top_cell_pressed1, self.y_top_cell_pressed1),
+        pygame.draw.line(self.screen, self.color_red, (self.x_top_cell_pressed1, self.y_top_cell_pressed1),
                          (self.x_low_cell_pressed1, self.y_low_cell_pressed1), width=5)
         self.cell_dict[self.cell_pressed] = 1
 
     def draw_circ(self):
-        pygame.draw.circle(screen, self.color_blue, (self.x_center, self.y_center), 50, width=5)
+        pygame.draw.circle(self.screen, self.color_blue, (self.x_center, self.y_center), 50, width=5)
         self.cell_dict[self.cell_pressed] = 2
 
     def check_win(self):
@@ -133,22 +136,3 @@ class Board:
     def get_click(self, mouse_pos):
         cell = self.get_cell(mouse_pos)
         self.on_click(cell)
-
-
-if __name__ == '__main__':
-    pygame.init()
-    pygame.display.set_caption('Крестики нолики')
-    size = width, height = 600, 600
-    screen = pygame.display.set_mode(size)
-    board = Board(3, 3)
-    board.set_view(50, 10, 150)
-    running = True
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                board.get_click(event.pos)
-        # screen.fill((0, 0, 0))
-        board.render(screen)
-        pygame.display.flip()
