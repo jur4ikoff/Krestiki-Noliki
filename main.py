@@ -7,7 +7,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QPainter, QColor, QPixmap
 from PyQt5 import uic
 from PyQt5.QtWidgets import QMainWindow
-from PyQt5.QtWidgets import QWidget, QApplication, QPushButton, QInputDialog, QCalendarWidget
+from PyQt5.QtWidgets import QWidget, QApplication, QPushButton, QInputDialog
 from PyQt5.QtWidgets import QCheckBox, QLabel, QLineEdit, QVBoxLayout, QGridLayout
 import sqlite3
 import datetime as dt
@@ -28,6 +28,8 @@ def load_image(name, colorkey=None):
 
 
 def start_screen():
+    FPS = 144
+    clock = pygame.time.Clock()
     intro_text = ["   ЗАСТАВКА", "",
                   "Правила игры",
                   "ваша задача закрыть все клетки,",
@@ -54,8 +56,9 @@ def start_screen():
                 sys.exit()
             elif event.type == pygame.KEYDOWN or \
                     event.type == pygame.MOUSEBUTTONDOWN:
-                return  # начинаем игру
+                return
         pygame.display.flip()
+        clock.tick(FPS)
 
 
 class AboutWindow(QWidget):
@@ -100,16 +103,18 @@ class MainWindow(QMainWindow):
             board = game.Board(3, 3, screen, self.enm)
             board.set_view(50, 10, 150)
             running = True
+            MainWindow.hide(self)
             while running:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         running = False
+                        MainWindow.show(self)
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         board.get_click(event.pos)
                 # screen.fill((0, 0, 0))
                 board.render(screen)
                 pygame.display.flip()
-                MainWindow.hide(self)
+
 
 def main_wnd():
     if __name__ == '__main__':
@@ -147,12 +152,6 @@ if __name__ == '__main__':
                 if event.key == pygame.K_DOWN:
                     ev = event
                     a = 1
-        # camera.update(player)
-        # for sprite in all_sprites:
-        # camera.apply(sprite)
-        # all_sprites.draw(screen)
-        # all_sprites.update(ev, a)
-        # player_group.draw(screen)
         pygame.display.flip()
         screen.fill((255, 255, 255))
     pygame.quit()

@@ -1,6 +1,20 @@
 import pygame
 import sys
 import os
+import main as main1
+
+
+def terminate():
+    pygame.quit()
+    sys.exit()
+
+
+def start_main_wnd():
+    if __name__ == '__main__':
+        app = main1.QApplication(sys.argv)
+        ex = main1.MainWindow()
+        ex.show()
+        sys.exit(app.exec())
 
 
 def load_image(name, colorkey=None):
@@ -70,7 +84,7 @@ class Board:
         self.color_blue = pygame.Color('Blue')
 
         self.cell_pressed = cell
-        #self.cell_pressed = self.get_cell(event.pos)
+        # self.cell_pressed = self.get_cell(event.pos)
 
         self.x_top_cell_pressed = self.left + self.cell_size * self.cell_x + self.width * 10
         self.y_top_cell_pressed = self.top + self.cell_size * self.cell_y + self.height * 10
@@ -119,20 +133,67 @@ class Board:
                 or (self.cell_dict[0, 0] == self.cell_dict[1, 1] == self.cell_dict[2, 2] == 1) \
                 or (self.cell_dict[0, 2] == self.cell_dict[1, 1] == self.cell_dict[2, 0] == 1) \
                 or (self.cell_dict[0, 2] == self.cell_dict[1, 2] == self.cell_dict[2, 2] == 1) \
-                or (self.cell_dict[2, 2] == self.cell_dict[2, 1] == self.cell_dict[2, 0] == 1):
+                or (self.cell_dict[2, 2] == self.cell_dict[2, 1] == self.cell_dict[2, 0] == 1) \
+                or (self.cell_dict[0, 1] == self.cell_dict[1, 1] == self.cell_dict[2, 1] == 1) \
+                or (self.cell_dict[1, 0] == self.cell_dict[1, 1] == self.cell_dict[1, 2] == 1):
             print('победa крестиков')
-            win_side = 1
-            return win_side
+            self.win_side = 1
+            draw_status(self.win_side, self.width, self.height, self.screen)
+
+
         if (self.cell_dict[0, 0] == self.cell_dict[1, 0] == self.cell_dict[2, 0] == 2) \
                 or (self.cell_dict[0, 0] == self.cell_dict[0, 1] == self.cell_dict[0, 2] == 2) \
                 or (self.cell_dict[0, 0] == self.cell_dict[1, 1] == self.cell_dict[2, 2] == 2) \
                 or (self.cell_dict[0, 2] == self.cell_dict[1, 1] == self.cell_dict[2, 0] == 2) \
                 or (self.cell_dict[0, 2] == self.cell_dict[1, 2] == self.cell_dict[2, 2] == 2) \
-                or (self.cell_dict[2, 2] == self.cell_dict[2, 1] == self.cell_dict[2, 0] == 2):
+                or (self.cell_dict[2, 2] == self.cell_dict[2, 1] == self.cell_dict[2, 0] == 2) \
+                or (self.cell_dict[0, 1] == self.cell_dict[1, 1] == self.cell_dict[2, 1] == 2) \
+                or (self.cell_dict[1, 0] == self.cell_dict[1, 1] == self.cell_dict[1, 2] == 2):
             print('победа ноликов')
-            win_side = 2
-            return win_side
+            self.win_side = 2
+            draw_status(self.win_side, self.width, self.height, self.screen)
+
 
     def get_click(self, mouse_pos):
         cell = self.get_cell(mouse_pos)
         self.on_click(cell)
+
+
+def draw_status(win_side, width, height, screen):
+    FPS = 144
+    clock = pygame.time.Clock()
+    if win_side == 1:
+        intro_text = ["Крестики выиграли",
+                      "Нажмите любую клавишу,",
+                      "чтобы выйти в меню."]
+    if win_side == 2:
+        intro_text = ["Крестики выиграли",
+                      "Нажмите любую клавишу,",
+                      "чтобы выйти в меню"]
+    else:
+        intro_text = ["Ничья",
+                      "Нажмите любую клавишу,",
+                      "чтобы выйти в меню"]
+    fon = pygame.transform.scale(load_image('fon.jpg'), (width, height))
+    screen.blit(fon, (0, 0))
+    font = pygame.font.Font(None, 40)
+    text_coord = height // 3
+    for line in intro_text:
+        string_rendered = font.render(line, 1, pygame.Color('white'))
+        intro_rect = string_rendered.get_rect()
+        text_coord += 10
+        intro_rect.top = text_coord
+        intro_rect.x = width // 4
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
+
+    while True:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
+                start_main_wnd()
+        pygame.display.flip()
+
+        clock.tick(FPS)
