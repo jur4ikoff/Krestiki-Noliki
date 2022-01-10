@@ -167,23 +167,23 @@ def draw_status(win_side, width, height, screen):
                       "Нажмите любую клавишу,",
                       "чтобы выйти в меню."]
     if win_side == 2:
-        intro_text = ["Крестики выиграли",
+        intro_text = ["Нолики выиграли",
                       "Нажмите любую клавишу,",
                       "чтобы выйти в меню"]
-    else:
+    if win_side == 0:
         intro_text = ["Ничья",
                       "Нажмите любую клавишу,",
                       "чтобы выйти в меню"]
     fon = pygame.transform.scale(load_image('fon.jpg'), (width, height))
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 40)
-    text_coord = height // 3
+    text_coord = height * 40
     for line in intro_text:
         string_rendered = font.render(line, 1, pygame.Color('white'))
         intro_rect = string_rendered.get_rect()
-        text_coord += 10
+        text_coord += 20
         intro_rect.top = text_coord
-        intro_rect.x = width // 4
+        intro_rect.x = width * 180
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
 
@@ -193,7 +193,8 @@ def draw_status(win_side, width, height, screen):
             if event.type == pygame.QUIT:
                 terminate()
             elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
-                start_main_wnd()
+                pass
+                # start_main_wnd()
         pygame.display.flip()
 
         clock.tick(FPS)
