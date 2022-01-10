@@ -6,14 +6,14 @@ import main as main1
 
 def terminate():
     pygame.quit()
-    sys.exit()
+    # sys.exit()
 
 
 def start_main_wnd():
     if __name__ == '__main__':
         app = main1.QApplication(sys.argv)
-        ex = main1.MainWindow()
-        ex.show()
+        ex1 = main1.MainWindow()
+        ex1.show()
         sys.exit(app.exec())
 
 
@@ -28,11 +28,12 @@ def load_image(name, colorkey=None):
 
 
 class Board:
-    def __init__(self, width, height, surface, enemy):
+    def __init__(self, width, height, surface, enemy, text):
         self.screen = surface
         self.width = width
         self.height = height
         self.board = [[0] * width for _ in range(height)]
+        self.text = text
         self.top = 10
         self.left = 10
         self.cell_size = 30
@@ -65,7 +66,6 @@ class Board:
             self.x += self.cell_size
 
     def get_cell(self, mouse_pos):
-        # print(mouse_pos)
         self.x1, self.y1 = mouse_pos
         self.x1 -= self.left
         self.y1 -= self.top
@@ -82,9 +82,7 @@ class Board:
     def on_click(self, cell):
         self.color_red = pygame.Color('Red')
         self.color_blue = pygame.Color('Blue')
-
         self.cell_pressed = cell
-        # self.cell_pressed = self.get_cell(event.pos)
 
         self.x_top_cell_pressed = self.left + self.cell_size * self.cell_x + self.width * 10
         self.y_top_cell_pressed = self.top + self.cell_size * self.cell_y + self.height * 10
@@ -140,7 +138,6 @@ class Board:
             self.win_side = 1
             draw_status(self.win_side, self.width, self.height, self.screen)
 
-
         if (self.cell_dict[0, 0] == self.cell_dict[1, 0] == self.cell_dict[2, 0] == 2) \
                 or (self.cell_dict[0, 0] == self.cell_dict[0, 1] == self.cell_dict[0, 2] == 2) \
                 or (self.cell_dict[0, 0] == self.cell_dict[1, 1] == self.cell_dict[2, 2] == 2) \
@@ -153,6 +150,13 @@ class Board:
             self.win_side = 2
             draw_status(self.win_side, self.width, self.height, self.screen)
 
+        if self.cell_dict[0, 1] != 0 and self.cell_dict[0, 2] != 0 and self.cell_dict[0, 0] != 0 \
+                and self.cell_dict[1, 0] != 0 and self.cell_dict[2, 2] != 0 \
+                and self.cell_dict[1, 1] != 0 and self.cell_dict[1, 2] != 0 \
+                and self.cell_dict[2, 0] != 0 and self.cell_dict[2, 1] != 0:
+            print('Ничья')
+            self.win_side = 3
+            draw_status(self.win_side, self.width, self.height, self.screen)
 
     def get_click(self, mouse_pos):
         cell = self.get_cell(mouse_pos)
@@ -170,7 +174,7 @@ def draw_status(win_side, width, height, screen):
         intro_text = ["Нолики выиграли",
                       "Нажмите любую клавишу,",
                       "чтобы выйти в меню"]
-    if win_side == 0:
+    if win_side == 3:
         intro_text = ["Ничья",
                       "Нажмите любую клавишу,",
                       "чтобы выйти в меню"]
@@ -193,8 +197,8 @@ def draw_status(win_side, width, height, screen):
             if event.type == pygame.QUIT:
                 terminate()
             elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
-                pass
-                # start_main_wnd()
-        pygame.display.flip()
+                terminate()
 
+        pygame.display.flip()
         clock.tick(FPS)
+        start_main_wnd()

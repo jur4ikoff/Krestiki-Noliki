@@ -40,16 +40,19 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
+        <widget class="QLineEdit" name="lineEdit"/>
+       </item>
+       <item>
         <widget class="QPushButton" name="pushButton">
          <property name="text">
-          <string>Одиночная игра</string>
+          <string>Подтвердить</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QLabel" name="label_2">
          <property name="text">
-          <string>Играйте против искусственного интелекта.</string>
+          <string>   Введите ваш никнейм.</string>
          </property>
         </widget>
        </item>

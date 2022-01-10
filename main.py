@@ -83,6 +83,7 @@ class MainWindow(QMainWindow):
 
     def initUI(self):
         self.pushButton_2.clicked.connect(self.btn2)
+        self.pushButton.clicked.connect(self.nick_proceed)
 
     def about(self):
         self.about_window.show()
@@ -94,13 +95,19 @@ class MainWindow(QMainWindow):
         self.enm = 1
         self.start_game()
 
+    def nick_proceed(self):
+        self.text = self.lineEdit.text()
+        if self.text == '':
+            self.text = 'Anonim'
+        print(self.text)
+
     def start_game(self):
         if __name__ == '__main__':
             pygame.init()
             pygame.display.set_caption('Крестики нолики')
             size = width, height = 1280, 720
             screen = pygame.display.set_mode(size)
-            board = game.Board(3, 3, screen, self.enm)
+            board = game.Board(3, 3, screen, self.enm, self.text)
             board.set_view(50, 10, 150)
             running = True
             MainWindow.hide(self)
@@ -124,9 +131,6 @@ def main_wnd():
         sys.exit(app.exec())
 
 
-
-
-
 if __name__ == '__main__':
     running = True
     start_screen()
@@ -140,18 +144,7 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    ev = event
-                    a = 2
-                if event.key == pygame.K_UP:
-                    ev = event
-                    a = 3
-                if event.key == pygame.K_RIGHT:
-                    ev = event
-                    a = 4
-                if event.key == pygame.K_DOWN:
-                    ev = event
-                    a = 1
+                pass
         pygame.display.flip()
         screen.fill((255, 255, 255))
     pygame.quit()
