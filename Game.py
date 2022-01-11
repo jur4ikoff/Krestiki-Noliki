@@ -2,6 +2,7 @@ import pygame
 import sys
 import os
 import main as main1
+import sqlite3
 
 
 def terminate():
@@ -28,12 +29,12 @@ def load_image(name, colorkey=None):
 
 
 class Board:
-    def __init__(self, width, height, surface, enemy, text):
+    def __init__(self, width, height, surface, enemy, nick):
         self.screen = surface
         self.width = width
         self.height = height
         self.board = [[0] * width for _ in range(height)]
-        self.text = text
+        self.nick = nick
         self.top = 10
         self.left = 10
         self.cell_size = 30
@@ -196,9 +197,8 @@ def draw_status(win_side, width, height, screen):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
-            elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
+            elif event.type == pygame.KEYDOWN:
                 terminate()
-
-        pygame.display.flip()
-        clock.tick(FPS)
+            pygame.display.flip()
+            clock.tick(FPS)
         start_main_wnd()

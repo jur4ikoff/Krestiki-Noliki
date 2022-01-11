@@ -96,6 +96,19 @@
      </item>
     </layout>
    </widget>
+   <widget class="QLabel" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>520</x>
+      <y>530</y>
+      <width>192</width>
+      <height>86</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Ваш никнейм:</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

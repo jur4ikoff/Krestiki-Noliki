@@ -84,22 +84,33 @@ class MainWindow(QMainWindow):
     def initUI(self):
         self.pushButton_2.clicked.connect(self.btn2)
         self.pushButton.clicked.connect(self.nick_proceed)
-
+        self.def_text = 'Ваш никнейм:'
+        self.nick = self.lineEdit.text()
+        print(self.nick)
     def about(self):
         self.about_window.show()
 
-    def btn1(self):
-        self.enm = 0
 
     def btn2(self):
         self.enm = 1
         self.start_game()
 
     def nick_proceed(self):
-        self.text = self.lineEdit.text()
-        if self.text == '':
-            self.text = 'Anonim'
-        print(self.text)
+        self.nick = self.lineEdit.text()
+        if self.nick == '':
+            self.nick = 'Anonim'
+        self.label_5.setText(self.def_text + ' ' + self.nick)
+        print(self.nick)
+        con = sqlite3.connect("data\\bd.sqlite")
+        cur = con.cursor()
+
+        result = cur.execute("""SELECT Nickname
+                    FROM Base""").fetchall()
+        if self.nick not in result:
+            pass
+
+        #for elem in result:
+        #    pass
 
     def start_game(self):
         if __name__ == '__main__':
@@ -107,7 +118,7 @@ class MainWindow(QMainWindow):
             pygame.display.set_caption('Крестики нолики')
             size = width, height = 1280, 720
             screen = pygame.display.set_mode(size)
-            board = game.Board(3, 3, screen, self.enm, self.text)
+            board = game.Board(3, 3, screen, self.enm, self.nick)
             board.set_view(50, 10, 150)
             running = True
             MainWindow.hide(self)

@@ -2,4 +2,3 @@ PyQt5==5.11
 pyqt5-tools=5.15.4.3.2
 pyqt5-plugins=5.15.4.2.2
 pygame=2.1.0
-
