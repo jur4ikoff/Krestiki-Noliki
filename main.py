@@ -87,9 +87,9 @@ class MainWindow(QMainWindow):
         self.def_text = 'Ваш никнейм:'
         self.nick = self.lineEdit.text()
         print(self.nick)
+
     def about(self):
         self.about_window.show()
-
 
     def btn2(self):
         self.enm = 1
@@ -100,16 +100,29 @@ class MainWindow(QMainWindow):
         if self.nick == '':
             self.nick = 'Anonim'
         self.label_5.setText(self.def_text + ' ' + self.nick)
-        print(self.nick)
+        self.nick = self.nick.replace(' ', '')
+        win = 0
+        lose = 0
+        draw = 0
         con = sqlite3.connect("data\\bd.sqlite")
         cur = con.cursor()
 
         result = cur.execute("""SELECT Nickname
                     FROM Base""").fetchall()
-        if self.nick not in result:
-            pass
+        flag = False
 
-        #for elem in result:
+        for i in result:
+            if self.nick == i[0]:
+                flag = True
+        if not flag:
+            cur.execute("""INSERT INTO Base(Nickname, Win, Lose, Draw)
+             VALUES(?, ?, ?, ?)""", (self.nick, win, lose, draw))
+            con.commit()
+            print("Новый никнейм добавлен")
+        else:
+            print('Никнейм есть в бд')
+
+        # for elem in result:
         #    pass
 
     def start_game(self):

@@ -43,6 +43,10 @@ class Board:
         self.move_now = 1
         self.cell_dict = {}
         empty_cell = 0
+
+        if self.nick == '':
+            self.nick = 'Anonim'
+
         for i in range(self.width):
             for j in range(self.height):
                 cell_temp = i, j
@@ -135,8 +139,9 @@ class Board:
                 or (self.cell_dict[2, 2] == self.cell_dict[2, 1] == self.cell_dict[2, 0] == 1) \
                 or (self.cell_dict[0, 1] == self.cell_dict[1, 1] == self.cell_dict[2, 1] == 1) \
                 or (self.cell_dict[1, 0] == self.cell_dict[1, 1] == self.cell_dict[1, 2] == 1):
-            print('победa крестиков')
+            print('ПОБЕДА')
             self.win_side = 1
+            self.base_event()
             draw_status(self.win_side, self.width, self.height, self.screen)
 
         if (self.cell_dict[0, 0] == self.cell_dict[1, 0] == self.cell_dict[2, 0] == 2) \
@@ -147,17 +152,57 @@ class Board:
                 or (self.cell_dict[2, 2] == self.cell_dict[2, 1] == self.cell_dict[2, 0] == 2) \
                 or (self.cell_dict[0, 1] == self.cell_dict[1, 1] == self.cell_dict[2, 1] == 2) \
                 or (self.cell_dict[1, 0] == self.cell_dict[1, 1] == self.cell_dict[1, 2] == 2):
-            print('победа ноликов')
+            print('ПОРАЖЕНИЕ')
             self.win_side = 2
+            self.base_event()
             draw_status(self.win_side, self.width, self.height, self.screen)
 
         if self.cell_dict[0, 1] != 0 and self.cell_dict[0, 2] != 0 and self.cell_dict[0, 0] != 0 \
                 and self.cell_dict[1, 0] != 0 and self.cell_dict[2, 2] != 0 \
                 and self.cell_dict[1, 1] != 0 and self.cell_dict[1, 2] != 0 \
                 and self.cell_dict[2, 0] != 0 and self.cell_dict[2, 1] != 0:
-            print('Ничья')
+            print('НИЧЬЯ')
             self.win_side = 3
+            self.base_event()
             draw_status(self.win_side, self.width, self.height, self.screen)
+
+    def base_event(self):
+        con = sqlite3.connect("data\\bd.sqlite")
+        cur = con.cursor()
+
+        result = cur.execute("""SELECT *
+                            FROM Base""").fetchall()
+
+        print(self.nick)
+        for i in result:
+            print(i)
+            if i[1] == self.nick:
+                print(i[2])
+                if self.win_side == 1:
+                    win = int(i[2])
+                    win += 1
+                    cur.execute("""UPDATE Base
+                                SET Win = ?
+                                WHERE Nickname = ?""", (win, self.nick))
+                    con.commit()
+                    print(win)
+                if self.win_side == 2:
+                    lose = int(i[3])
+                    lose += 1
+                    cur.execute("""UPDATE Base
+                                SET Lose = ?
+                                WHERE Nickname = ?""", (lose, self.nick))
+                    con.commit()
+                    print(lose)
+                if self.win_side == 3:
+                    draw = int(i[4])
+                    draw += 1
+                    cur.execute("""UPDATE Base
+                                SET Draw = ?
+                                WHERE Nickname = ?""", (draw, self.nick))
+                    con.commit()
+                    print(draw)
+
 
     def get_click(self, mouse_pos):
         cell = self.get_cell(mouse_pos)
@@ -191,6 +236,7 @@ def draw_status(win_side, width, height, screen):
         intro_rect.x = width * 180
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
+        ev = 0
 
     while True:
 
@@ -198,7 +244,8 @@ def draw_status(win_side, width, height, screen):
             if event.type == pygame.QUIT:
                 terminate()
             elif event.type == pygame.KEYDOWN:
-                terminate()
+                start_main_wnd()
             pygame.display.flip()
             clock.tick(FPS)
-        start_main_wnd()
+
+        # start_main_wnd()
