@@ -173,4 +173,3 @@ if __name__ == '__main__':
         screen.fill((255, 255, 255))
     pygame.quit()
 
-# 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
