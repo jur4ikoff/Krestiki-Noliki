@@ -17,14 +17,14 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>360</x>
+      <x>350</x>
       <y>150</y>
-      <width>511</width>
+      <width>551</width>
       <height>81</height>
      </rect>
     </property>
     <property name="text">
-     <string>Это игра крестики нолики. На данный момент есть 2 режима: &quot;Одиночный&quot; и &quot;Игра с другом&quot;</string>
+     <string>Это игра крестики нолики. Можно играть друг с другом на одном устройстве и просматривать статистику</string>
     </property>
    </widget>
    <widget class="QWidget" name="horizontalLayoutWidget">

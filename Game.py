@@ -175,9 +175,7 @@ class Board:
 
         print(self.nick)
         for i in result:
-            print(i)
             if i[1] == self.nick:
-                print(i[2])
                 if self.win_side == 1:
                     win = int(i[2])
                     win += 1
@@ -185,7 +183,6 @@ class Board:
                                 SET Win = ?
                                 WHERE Nickname = ?""", (win, self.nick))
                     con.commit()
-                    print(win)
                 if self.win_side == 2:
                     lose = int(i[3])
                     lose += 1
@@ -193,7 +190,6 @@ class Board:
                                 SET Lose = ?
                                 WHERE Nickname = ?""", (lose, self.nick))
                     con.commit()
-                    print(lose)
                 if self.win_side == 3:
                     draw = int(i[4])
                     draw += 1
@@ -210,8 +206,6 @@ class Board:
 
 
 def draw_status(win_side, width, height, screen):
-    FPS = 144
-    clock = pygame.time.Clock()
     if win_side == 1:
         intro_text = ["Крестики выиграли",
                       "Нажмите любую клавишу,",
@@ -237,15 +231,15 @@ def draw_status(win_side, width, height, screen):
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
         ev = 0
-
-    while True:
+    running = True
+    while running:
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                terminate()
+                running = False
             elif event.type == pygame.KEYDOWN:
                 start_main_wnd()
             pygame.display.flip()
-            clock.tick(FPS)
+
 
         # start_main_wnd()

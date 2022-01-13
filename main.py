@@ -2,6 +2,7 @@ import sys
 import pygame
 import os
 import Game as game
+import Stata as stata
 import random
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QPainter, QColor, QPixmap
@@ -84,6 +85,7 @@ class MainWindow(QMainWindow):
     def initUI(self):
         self.pushButton_2.clicked.connect(self.btn2)
         self.pushButton.clicked.connect(self.nick_proceed)
+        self.pushButton_3.clicked.connect(self.btn3)
         self.def_text = 'Ваш никнейм:'
         self.nick = self.lineEdit.text()
         print(self.nick)
@@ -94,6 +96,29 @@ class MainWindow(QMainWindow):
     def btn2(self):
         self.enm = 1
         self.start_game()
+
+    def btn3(self):
+        self.go_to_stat()
+
+    def go_to_stat(self):
+        if __name__ == '__main__':
+            pygame.init()
+            pygame.display.set_caption('Статистика')
+            size = width, height = 1280, 720
+            screen = pygame.display.set_mode(size)
+            stats = stata.Search_stat(screen, width, height, self.nick)
+            running = True
+            MainWindow.hide(self)
+            while running:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        running = False
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        pass
+                        #stats.get_click(event.pos)
+                # screen.fill((0, 0, 0))
+                pygame.display.flip()
+            MainWindow.show(self)
 
     def nick_proceed(self):
         self.nick = self.lineEdit.text()
@@ -134,12 +159,10 @@ class MainWindow(QMainWindow):
             board = game.Board(3, 3, screen, self.enm, self.nick)
             board.set_view(50, 10, 150)
             running = True
-            MainWindow.hide(self)
             while running:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         running = False
-                        MainWindow.show(self)
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         board.get_click(event.pos)
                 # screen.fill((0, 0, 0))
