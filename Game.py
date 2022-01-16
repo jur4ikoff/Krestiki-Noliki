@@ -223,7 +223,12 @@ def draw_status(win_side, width, height, screen):
     font = pygame.font.Font(None, 40)
     text_coord = height * 40
     for line in intro_text:
-        string_rendered = font.render(line, 1, pygame.Color('white'))
+        if win_side == 1:
+            string_rendered = font.render(line, 1, pygame.Color('green'))
+        if win_side == 2:
+            string_rendered = font.render(line, 1, pygame.Color('red'))
+        if win_side == 2:
+            string_rendered = font.render(line, 1, pygame.Color('blue'))
         intro_rect = string_rendered.get_rect()
         text_coord += 20
         intro_rect.top = text_coord
