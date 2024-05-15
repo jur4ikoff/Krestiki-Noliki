@@ -2,7 +2,7 @@ import sys
 import pygame
 import os
 # import Game as game
-# import Stata as stata
+from constrains import main_width, main_height
 import random
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtGui import QPainter, QColor, QPixmap
@@ -14,9 +14,7 @@ import sqlite3
 import datetime as dt
 from PyQt6.QtWidgets import QTableWidgetItem, QDialog
 
-pygame.init()
-size = width, height = 1280, 720
-screen = pygame.display.set_mode(size)
+
 
 
 def load_image(name, colorkey=None):
@@ -29,6 +27,8 @@ def load_image(name, colorkey=None):
 
 
 def start_screen():
+    pygame.init()
+    screen = pygame.display.set_mode((main_width, main_height))
     FPS = 144
     clock = pygame.time.Clock()
     intro_text = ["   ЗАСТАВКА", "",
@@ -37,17 +37,16 @@ def start_screen():
                   "по вертикали или горизонтали или диагонали",
                   "Для начала нажмите на пробел"]
 
-    fon = pygame.transform.scale(load_image('data.png'), (width, height))
-    # fon = pygame.Color(255, 255, 100)
+    fon = pygame.transform.scale(load_image('background.png'), (main_width, main_height))
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 40)
-    text_coord = height // 3
+    text_coord = main_height // 3
     for line in intro_text:
         string_rendered = font.render(line, 1, pygame.Color('black'))
         intro_rect = string_rendered.get_rect()
         text_coord += 10
         intro_rect.top = text_coord
-        intro_rect.x = width // 4
+        intro_rect.x = main_width // 4
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
 
@@ -124,35 +123,6 @@ class MainWindow(QMainWindow):
             MainWindow.show(self)
     """
 
-    def nick_proceed(self):
-        self.nick = self.lineEdit.text()
-        if self.nick == '':
-            self.nick = 'Anonim'
-        self.label_5.setText(self.def_text + ' ' + self.nick)
-        self.nick = self.nick.replace(' ', '')
-        win = 0
-        lose = 0
-        draw = 0
-        con = sqlite3.connect("data\\bd.sqlite")
-        cur = con.cursor()
-
-        result = cur.execute("""SELECT Nickname
-                    FROM Base""").fetchall()
-        flag = False
-
-        for i in result:
-            if self.nick == i[0]:
-                flag = True
-        if not flag:
-            cur.execute("""INSERT INTO Base(Nickname, Win, Lose, Draw)
-             VALUES(?, ?, ?, ?)""", (self.nick, win, lose, draw))
-            con.commit()
-            print("Новый никнейм добавлен")
-        else:
-            print('Никнейм есть в бд')
-
-        # for elem in result:
-        #    pass
 
     """
     def start_game(self):
@@ -175,28 +145,27 @@ class MainWindow(QMainWindow):
                 pygame.display.flip()
     """
 
-def main_wnd():
-    if __name__ == '__main__':
-        app = QApplication(sys.argv)
-        ex = MainWindow()
-        ex.show()
-        sys.exit(app.exec())
+
+def run_main_window():
+    app = QApplication(sys.argv)
+    ex = MainWindow()
+    ex.show()
+    sys.exit(app.exec())
 
 
 if __name__ == '__main__':
     running = True
     start_screen()
-    main_wnd()
+    # run_main_window()
 
-    # player, level_x, level_y = generate_level(load_level(name_lvl))
-    while running:
-        a = None
-        ev = None
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            if event.type == pygame.KEYDOWN:
-                pass
-        pygame.display.flip()
-        screen.fill((255, 255, 255))
-    pygame.quit()
+    # while running:
+    #     a = None
+    #     ev = None
+    #     for event in pygame.event.get():
+    #         if event.type == pygame.QUIT:
+    #             running = False
+    #         if event.type == pygame.KEYDOWN:
+    #             pass
+    #     pygame.display.flip()
+    #     screen.fill((255, 255, 255))
+    # pygame.quit()

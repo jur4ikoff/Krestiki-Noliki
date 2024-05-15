@@ -2,15 +2,7 @@ import pygame
 from constrains import game_width, game_height, get_text_gamemode
 import sys
 import os
-import main as main
-
-
-def start_main_wnd():
-    if __name__ == '__main__':
-        app = main.QApplication(sys.argv)
-        ex1 = main.MainWindow()
-        ex1.show()
-        sys.exit(app.exec())
+from main import run_main_window
 
 
 class Game:
@@ -22,7 +14,8 @@ class Game:
         self.field_size = field_size
         self.mode = mode
         self.cells = [[0] * field_size for i in range(field_size)]
-        self.move = 0
+        self.move = 1
+        self.win = 0
 
         self.processing()
 
@@ -30,17 +23,19 @@ class Game:
         """Запуск всех функций"""
 
         message = get_text_gamemode(self.mode)
-        self.draw_text(f'{message}    Поле {field_size}x{field_size}', shift_y=10, fontsize=28)
+        self.draw_text(f'{message}    Поле {self.field_size}x{self.field_size}', shift_y=10, fontsize=28)
         self.draw_text("Чтобы выйти нажмите ESC", fontsize=20, shift_y=50)
-        self.cell_size = (min(self.width, self.height) // (self.field_size + 2))
-        self.draw_cells()
 
-    def draw_text(self, message, fontsize=28, shift_y=0):
+        self.cell_size = int(min(self.width, self.height) // (self.field_size + 1.6))
+        self.draw_cells()
+        self.count = 0
+
+    def draw_text(self, message, fontsize=28, shift_y=0, color=(250, 250, 250)):
         font = pygame.font.Font(None, fontsize)
-        text = font.render(message, True, (250, 250, 250))
+        text = font.render(message, True, color)
         text_x = self.width // 2 - text.get_width() // 2
         text_y = text.get_height() + shift_y
-        screen.blit(text, (text_x, text_y))
+        self.screen.blit(text, (text_x, text_y))
 
     def draw_cells(self) -> None:
         """Рендер клеток"""
@@ -66,164 +61,163 @@ class Game:
 
         x -= self.start_x
         y -= self.start_y
-        i = y // self.cell_size
-        j = x // self.cell_size
+        x //= self.cell_size
+        y //= self.cell_size
         if is_cell:
-            return i, j
+            return x, y
         return None
 
     def get_click(self, mouse_pos):
         """ Обработка нажатия """
         self.cell = self.get_cell(mouse_pos)
-        if self.cell:
-            print(self.cell)
-        self.on_click()
+        if not self.cell:
+            return
+        pos_x, pos_y = self.cell
 
-    def on_click(self):
-        pass
-    
-    
-    
-    """
-    def on_click(self, cell):
-        self.color_red = pygame.Color('Red')
-        self.color_blue = pygame.Color('Blue')
-        self.cell_pressed = cell
+        if self.cells[pos_y][pos_x] == 0 and self.win == 0:
+            self.on_click(pos_x, pos_y)
+        if self.win == -1:
+            print("ничья")
+            self.draw_text("Ничья", fontsize=40, shift_y=(self.height - 100), color=(0, 250, 0))
+        if self.win == 1:
+            print("Победил первый игрок")
+            self.draw_text("Победил первый игрок", fontsize=40, shift_y=(self.height - 100), color=(250, 0, 0))
+        if self.win == 2:
+            print("Победил второй игрок")
+            self.draw_text("Победил второй игрок", fontsize=40, shift_y=(self.height - 100), color=(0, 0, 250))
 
-        self.x_top_cell_pressed = self.left + self.cell_size * self.cell_x + self.width * 10
-        self.y_top_cell_pressed = self.top + self.cell_size * self.cell_y + self.height * 10
-        self.x_low_cell_pressed = self.left + self.cell_size * (self.cell_x) \
-                                  + self.cell_size - self.width * 10
-        self.y_low_cell_pressed = self.top + self.cell_size * (self.cell_y) \
-                                  + self.cell_size - self.height * 10
+    def on_click(self, pos_x, pos_y):
+        x = pos_x * self.cell_size + self.cell_size // 2 + self.start_x
+        y = pos_y * self.cell_size + self.cell_size // 2 + self.start_y
 
-        self.x_top_cell_pressed1 = self.left + self.cell_size * (self.cell_x) \
-                                   + self.cell_size - self.width * 10
-        self.y_top_cell_pressed1 = self.top + self.cell_size * self.cell_y + self.height * 10
-        self.x_low_cell_pressed1 = self.left + self.cell_size * (self.cell_x) \
-                                   + self.width * 10
-        self.y_low_cell_pressed1 = self.top + self.cell_size * (self.cell_y) \
-                                   + self.cell_size - self.height * 10
+        if self.move == 1:
+            self.draw_cross(x, y)
+            self.cells[pos_y][pos_x] = 1
+            self.move = 2
+        elif self.move == 2:
+            self.draw_circle(x, y)
+            self.cells[pos_y][pos_x] = 2
+            self.move = 1
+        res = self.check_win()
+        print(res)
+        self.count += 1
+        if res != 0:
+            self.win = res
+            return res
+        if self.count == self.field_size ** 2:
+            self.win = -1
+            return -1
+        return -1
 
-        self.x_center = self.left + (self.cell_size * self.cell_x) + self.cell_size // 2
-        self.y_center = self.top + (self.cell_size * self.cell_y) + self.cell_size // 2
+    def draw_circle(self, x, y):
+        color = pygame.Color((0, 0, 255))
+        pygame.draw.circle(self.screen, color, (x, y), radius=self.cell_size // 3, width=self.cell_size // 35)
 
-        print(self.cell_pressed)
-        if self.cell_pressed != 'None':
-            if self.cell_dict[self.cell_pressed] == 0:
-                self.move_now += 1
-                if self.move_now % 2 == 0:
-                    self.draw_crest()
-                if self.move_now % 2 == 1:
-                    self.draw_circ()
-        self.side_win = self.check_win()
+    def draw_cross(self, x, y):
+        shift = (self.cell_size ** 2 + self.cell_size ** 2) ** 0.5 // 5
+        color = pygame.Color(225, 0, 0)
+        pygame.draw.line(self.screen, color, (x, y),
+                         (x + shift, y + shift), width=self.cell_size // 35)
+        pygame.draw.line(self.screen, color, (x, y),
+                         (x + shift, y - shift), width=self.cell_size // 35)
+        pygame.draw.line(self.screen, color, (x, y),
+                         (x - shift, y + shift), width=self.cell_size // 35)
+        pygame.draw.line(self.screen, color, (x, y),
+                         (x - shift, y - shift), width=self.cell_size // 35)
 
-    def draw_crest(self):
-        pygame.draw.line(self.screen, self.color_red, (self.x_top_cell_pressed, self.y_top_cell_pressed),
-                         (self.x_low_cell_pressed, self.y_low_cell_pressed), width=5)
+    def check_win(self) -> int:
+        """Проверка ситуации на поле на победу"""
+        res: int = 0
+        # проверка горизонталей
+        count1, count2 = 0, 0
+        for i in range(self.field_size):
+            for j in range(self.field_size - 1):
+                if self.cells[i][j] == self.cells[i][j + 1]:
+                    if self.cells[i][j] == 1:
+                        count1 += 1
+                    elif self.cells[i][j] == 2:
+                        count2 += 1
+                else:
+                    count2, count1 = 0, 0
+            res = self.check_count(count1, count2)
+            if res != 0:
+                return res
 
-        pygame.draw.line(self.screen, self.color_red, (self.x_top_cell_pressed1, self.y_top_cell_pressed1),
-                         (self.x_low_cell_pressed1, self.y_low_cell_pressed1), width=5)
-        self.cell_dict[self.cell_pressed] = 1
+        count1, count2 = 0, 0
+        # проверка вертикалей
+        for i in range(self.field_size):
+            for j in range(self.field_size - 1):
+                if self.cells[j][i] == self.cells[j + 1][i]:
+                    if self.cells[j][i] == 1:
+                        count1 += 1
+                    elif self.cells[j][i] == 2:
+                        count2 += 1
+                else:
+                    count2, count1 = 0, 0
+            res = self.check_count(count1, count2)
+            if res != 0:
+                return res
 
-    def draw_circ(self):
-        pygame.draw.circle(self.screen, self.color_blue, (self.x_center, self.y_center), 50, width=5)
-        self.cell_dict[self.cell_pressed] = 2
+        # проверка главной диагонали
+        count1, count2 = 0, 0
+        for i in range(self.field_size - 1):
+            if self.cells[i][i] == self.cells[i + 1][i + 1]:
+                if self.cells[i][i] == 1:
+                    count1 += 1
+                elif self.cells[i][i] == 2:
+                    count2 += 1
+            else:
+                count2, count1 = 0, 0
+            res = self.check_count(count1, count2)
+            if res != 0:
+                return res
 
-    def check_win(self):
-        win_side = 0
-        if (self.cell_dict[0, 0] == self.cell_dict[1, 0] == self.cell_dict[2, 0] == 1) \
-                or (self.cell_dict[0, 0] == self.cell_dict[0, 1] == self.cell_dict[0, 2] == 1) \
-                or (self.cell_dict[0, 0] == self.cell_dict[1, 1] == self.cell_dict[2, 2] == 1) \
-                or (self.cell_dict[0, 2] == self.cell_dict[1, 1] == self.cell_dict[2, 0] == 1) \
-                or (self.cell_dict[0, 2] == self.cell_dict[1, 2] == self.cell_dict[2, 2] == 1) \
-                or (self.cell_dict[2, 2] == self.cell_dict[2, 1] == self.cell_dict[2, 0] == 1) \
-                or (self.cell_dict[0, 1] == self.cell_dict[1, 1] == self.cell_dict[2, 1] == 1) \
-                or (self.cell_dict[1, 0] == self.cell_dict[1, 1] == self.cell_dict[1, 2] == 1):
-            print('ПОБЕДА')
-            self.win_side = 1
-            self.base_event()
-            draw_status(self.win_side, self.width, self.height, self.screen)
+        count1, count2 = 0, 0
+        for i in range(0, self.field_size - 1):
+            if self.cells[i][self.field_size - i - 1] == self.cells[i + 1][self.field_size - i - 2]:
+                if self.cells[i][self.field_size - i - 1] == 1:
+                    count1 += 1
+                elif self.cells[i][self.field_size - i - 1] == 2:
+                    count2 += 1
+            else:
+                count2, count1 = 0, 0
+            res = self.check_count(count1, count2)
+            if res != 0:
+                return res
 
-        if (self.cell_dict[0, 0] == self.cell_dict[1, 0] == self.cell_dict[2, 0] == 2) \
-                or (self.cell_dict[0, 0] == self.cell_dict[0, 1] == self.cell_dict[0, 2] == 2) \
-                or (self.cell_dict[0, 0] == self.cell_dict[1, 1] == self.cell_dict[2, 2] == 2) \
-                or (self.cell_dict[0, 2] == self.cell_dict[1, 1] == self.cell_dict[2, 0] == 2) \
-                or (self.cell_dict[0, 2] == self.cell_dict[1, 2] == self.cell_dict[2, 2] == 2) \
-                or (self.cell_dict[2, 2] == self.cell_dict[2, 1] == self.cell_dict[2, 0] == 2) \
-                or (self.cell_dict[0, 1] == self.cell_dict[1, 1] == self.cell_dict[2, 1] == 2) \
-                or (self.cell_dict[1, 0] == self.cell_dict[1, 1] == self.cell_dict[1, 2] == 2):
-            print('ПОРАЖЕНИЕ')
-            self.win_side = 2
-            self.base_event()
-            draw_status(self.win_side, self.width, self.height, self.screen)
+        return res
 
-        if self.cell_dict[0, 1] != 0 and self.cell_dict[0, 2] != 0 and self.cell_dict[0, 0] != 0 \
-                and self.cell_dict[1, 0] != 0 and self.cell_dict[2, 2] != 0 \
-                and self.cell_dict[1, 1] != 0 and self.cell_dict[1, 2] != 0 \
-                and self.cell_dict[2, 0] != 0 and self.cell_dict[2, 1] != 0:
-            print('НИЧЬЯ')
-            self.win_side = 3
-            self.base_event()
-            draw_status(self.win_side, self.width, self.height, self.screen)
-    """
+    def check_count(self, count1: int, count2: int) -> int:
+        if count1 == self.field_size - 1:
+            return 1
+        elif count2 == self.field_size - 1:
+            return 2
 
-    # def base_event(self):
-    #     con = sqlite3.connect("data\\bd.sqlite")
-    #     cur = con.cursor()
-    #
-    #     result = cur.execute("""
-    # SELECT *
-    #                         FROM Base""").fetchall()
-    #
-    #     print(self.nick)
-    #     for i in result:
-    #         if i[1] == self.nick:
-    #             if self.win_side == 1:
-    #                 win = int(i[2])
-    #                 win += 1
-    #                 cur.execute("""UPDATE Base
-    #                             SET Win = ?
-    #                             WHERE Nickname = ?""", (win, self.nick))
-    #                 con.commit()
-    #             if self.win_side == 2:
-    #                 lose = int(i[3])
-    #                 lose += 1
-    #                 cur.execute("""UPDATE Base
-    #                             SET Lose = ?
-    #                             WHERE Nickname = ?""", (lose, self.nick))
-    #                 con.commit()
-    #             if self.win_side == 3:
-    #                 draw = int(i[4])
-    #                 draw += 1
-    #                 cur.execute("""UPDATE Base
-    #                             SET Draw = ?
-    #                             WHERE Nickname = ?""", (draw, self.nick))
-    #                 con.commit()
-    #                 print(draw)
+        return 0
 
 
-pygame.init()
-pygame.display.set_caption('Крестики нолики')
-game_size = game_width, game_height
-screen = pygame.display.set_mode(game_size)
-mode = 0
-field_size = 3
-screen.fill((4, 4, 4))
-
-# инициализация класса game
-game = Game(screen, game_width, game_height, mode, field_size)
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            game.get_click(event.pos)
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                running = False
-                pygame.quit()
-                start_main_wnd()
-
-    pygame.display.flip()
+# pygame.init()
+# pygame.display.set_caption('Крестики нолики')
+# game_size = game_width, game_height
+# screen = pygame.display.set_mode(game_size)
+# mode = 0
+# field_size = 4
+# screen.fill((4, 4, 4))
+#
+# # инициализация класса game
+# game = Game(screen, game_width, game_height, mode, field_size)
+# running = True
+# while running:
+#     for event in pygame.event.get():
+#         if event.type == pygame.QUIT:
+#             running = False
+#         if event.type == pygame.MOUSEBUTTONDOWN:
+#             game.get_click(event.pos)
+#         elif event.type == pygame.KEYDOWN:
+#             if event.key == pygame.K_ESCAPE:
+#                 running = False
+#                 pygame.quit()
+#                 run_main_window()
+#
+#     pygame.display.flip()
+#
