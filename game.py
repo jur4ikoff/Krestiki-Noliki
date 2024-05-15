@@ -2,93 +2,61 @@ import pygame
 from constrains import game_width, game_height, get_text_gamemode
 import sys
 import os
-import main as main1
-import sqlite3
+import main as main
 
-"""
+
 def start_main_wnd():
     if __name__ == '__main__':
-        app = main1.QApplication(sys.argv)
-        ex1 = main1.MainWindow()
+        app = main.QApplication(sys.argv)
+        ex1 = main.MainWindow()
         ex1.show()
         sys.exit(app.exec())
 
-"""
-
-
-def load_image(name, colorkey=None):
-    fullname = os.path.join('data', name)
-    # если файл не существует, то выходим
-    if not os.path.isfile(fullname):
-        print(f"Файл с изображением '{fullname}' не найден")
-        sys.exit()
-    image = pygame.image.load(fullname)
-    return image
-
 
 class Game:
-    def __init__(self, width, height, screen, mode, field_size):
+    def __init__(self, screen, width, height, mode, field_size):
+        # инициализация основных переменных
         self.screen = screen
         self.width = width
         self.height = height
         self.field_size = field_size
+        self.mode = mode
+        self.cells = [[0] * field_size for i in range(field_size)]
+        self.move = 0
 
-        message = get_text_gamemode(mode)
-        self.draw_text(message)
+        self.processing()
 
-        """
-        self.board = [[0] * width for _ in range(height)]
-        self.top = 10
-        self.left = 10
-        self.cell_size = 30
+    def processing(self) -> None:
+        """Запуск всех функций"""
 
-        self.move_now = 1
-        self.cell_dict = {}
-        empty_cell = 0
+        message = get_text_gamemode(self.mode)
+        self.draw_text(f'{message}    Поле {field_size}x{field_size}', shift_y=10, fontsize=28)
+        self.draw_text("Чтобы выйти нажмите ESC", fontsize=20, shift_y=50)
+        self.cell_size = (min(self.width, self.height) // (self.field_size + 2))
+        self.draw_cells()
 
-        for i in range(self.width):
-            for j in range(self.height):
-                cell_temp = i, j
-                self.cell_dict[cell_temp] = empty_cell
-        """
-
-    def draw_text(self, message, fontsize=28):
+    def draw_text(self, message, fontsize=28, shift_y=0):
         font = pygame.font.Font(None, fontsize)
         text = font.render(message, True, (250, 250, 250))
         text_x = self.width // 2 - text.get_width() // 2
-        text_y = text.get_height() + 10
+        text_y = text.get_height() + shift_y
         screen.blit(text, (text_x, text_y))
 
-    def set_view(self, left, top, cell_size):
-        self.left = left
-        self.top = top
-        self.cell_size = cell_size
-
-    def render(self, screen):
-        self.x = self.left
-        self.y = self.top
-        count_cube = int(self.width) * int(self.height)
-        for i in range(self.width):
-            for j in range(self.height):
-                pygame.draw.rect(screen, (255, 255, 255, 100), (self.x, self.y, self.cell_size,
-                                                                self.cell_size), width=1)
-                self.y += self.cell_size
-            self.y = self.top
-            self.x += self.cell_size
+    def draw_cells(self) -> None:
+        """Рендер клеток"""
+        x, y = self.start_x, self.start_y = (self.width // 2 - self.cell_size * self.field_size // 2,
+                                             self.height // 2 - self.cell_size * self.field_size // 2)
+        for i in range(self.field_size):
+            for j in range(self.field_size):
+                pygame.draw.rect(self.screen, (250, 250, 250),
+                                 (x, y, self.cell_size, self.cell_size), self.cell_size // 50)
+                x += self.cell_size
+            x = self.start_x
+            y += self.cell_size
 
     def get_cell(self, mouse_pos):
-        self.x1, self.y1 = mouse_pos
-        self.x1 -= self.left
-        self.y1 -= self.top
-        self.cell_x = self.x1 // self.cell_size
-        self.cell_y = self.y1 // self.cell_size
-        cell_coords = self.cell_x, self.cell_y
-        if self.cell_x >= self.width or self.cell_x < 0:
-            cell_coords = 'None'
-        if self.cell_y >= self.height or self.cell_y < 0:
-            cell_coords = 'None'
-        # print(cell_coords)
-        return cell_coords
+        """Получение номера клетки по координатам мышки"""
+        print(mouse_pos)
 
     def get_click(self, mouse_pos):
         cell = self.get_cell(mouse_pos)
@@ -218,25 +186,27 @@ class Game:
     #                 print(draw)
 
 
-# переменные
-
 pygame.init()
 pygame.display.set_caption('Крестики нолики')
 game_size = game_width, game_height
 screen = pygame.display.set_mode(game_size)
 mode = 0
 field_size = 3
+screen.fill((4, 4, 4))
 
-# инициализация класса board
-game = Game(game_width, game_height, screen, mode, field_size)
-# board.set_view(500, 10, 150)
+# инициализация класса game
+game = Game(screen, game_width, game_height, mode, field_size)
 running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        # if event.type == pygame.MOUSEBUTTONDOWN:
-        #    board.get_click(event.pos)
-    # screen.fill((0, 0, 0))
-    # board.render(screen)
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            game.get_click(event.pos)
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                running = False
+                pygame.quit()
+                start_main_wnd()
+
     pygame.display.flip()
