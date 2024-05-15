@@ -1,5 +1,7 @@
 import pygame
 from constrains import game_width, game_height, get_text_gamemode
+
+
 # from main import run_main_window
 
 
@@ -19,16 +21,16 @@ class Game:
 
     def processing(self) -> None:
         """Запуск всех функций"""
-
         message = get_text_gamemode(self.mode)
-        self.draw_text(f'{message}    Поле {self.field_size}x{self.field_size}', shift_y=5, fontsize=36)
-        self.draw_text("Чтобы выйти нажмите ESC", fontsize=28, shift_y=50)
+        self.draw_text(f'{message}    Поле {self.field_size}x{self.field_size}', shift_y=4, fontsize=32)
+        self.draw_text("Чтобы выйти нажмите ESC", fontsize=24, shift_y=40)
 
         self.cell_size = int(min(self.width, self.height) // (self.field_size + 1.6))
         self.draw_cells()
         self.count = 0
 
     def draw_text(self, message, fontsize=28, shift_y=0, color=(250, 250, 250)):
+        """Рендер текста"""
         font = pygame.font.Font(None, fontsize)
         text = font.render(message, True, color)
         text_x = self.width // 2 - text.get_width() // 2
@@ -85,6 +87,7 @@ class Game:
             self.draw_text("Победил второй игрок", fontsize=40, shift_y=(self.height - 100), color=(0, 0, 250))
 
     def on_click(self, pos_x, pos_y):
+        """Отрисовка клика и добавление в массив"""
         x = pos_x * self.cell_size + self.cell_size // 2 + self.start_x
         y = pos_y * self.cell_size + self.cell_size // 2 + self.start_y
 
@@ -108,10 +111,12 @@ class Game:
         return -1
 
     def draw_circle(self, x, y):
+        """Функция рисует нолик"""
         color = pygame.Color((0, 0, 255))
         pygame.draw.circle(self.screen, color, (x, y), radius=self.cell_size // 3, width=self.cell_size // 35)
 
     def draw_cross(self, x, y):
+        """Функция рисует крестик"""
         shift = (self.cell_size ** 2 + self.cell_size ** 2) ** 0.5 // 5
         color = pygame.Color(225, 0, 0)
         pygame.draw.line(self.screen, color, (x, y),
@@ -186,35 +191,10 @@ class Game:
         return res
 
     def check_count(self, count1: int, count2: int) -> int:
+        """Сравнение счетчика с значением, необходимым для победы"""
         if count1 == self.field_size - 1:
             return 1
         elif count2 == self.field_size - 1:
             return 2
 
         return 0
-
-
-# pygame.init()
-# pygame.display.set_caption('Крестики нолики')
-# game_size = game_width, game_height
-# screen = pygame.display.set_mode(game_size)
-# mode = 0
-# field_size = 4
-# screen.fill((4, 4, 4))
-#
-# # инициализация класса game
-# game = Game(screen, game_width, game_height, mode, field_size)
-# running = True
-# while running:
-#     for event in pygame.event.get():
-#         if event.type == pygame.QUIT:
-#             running = False
-#         if event.type == pygame.MOUSEBUTTONDOWN:
-#             game.get_click(event.pos)
-#         elif event.type == pygame.KEYDOWN:
-#             if event.key == pygame.K_ESCAPE:
-#                 running = False
-#                 pygame.quit()
-#                 run_main_window()
-#
-#     pygame.display.flip()
