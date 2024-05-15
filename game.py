@@ -1,21 +1,19 @@
 import pygame
+from constrains import game_width, game_height, get_text_gamemode
 import sys
 import os
 import main as main1
 import sqlite3
 
-
-def terminate():
-    pygame.quit()
-    # sys.exit()
-
-
+"""
 def start_main_wnd():
     if __name__ == '__main__':
         app = main1.QApplication(sys.argv)
         ex1 = main1.MainWindow()
         ex1.show()
         sys.exit(app.exec())
+
+"""
 
 
 def load_image(name, colorkey=None):
@@ -28,31 +26,39 @@ def load_image(name, colorkey=None):
     return image
 
 
-class Board:
-    def __init__(self, width, height, surface, enemy, nick):
-        self.screen = surface
+class Game:
+    def __init__(self, width, height, screen, mode, field_size):
+        self.screen = screen
         self.width = width
         self.height = height
+        self.field_size = field_size
+
+        message = get_text_gamemode(mode)
+        self.draw_text(message)
+
+        """
         self.board = [[0] * width for _ in range(height)]
-        self.nick = nick
         self.top = 10
         self.left = 10
         self.cell_size = 30
 
-        self.enemy = enemy
         self.move_now = 1
         self.cell_dict = {}
         empty_cell = 0
-
-        if self.nick == '':
-            self.nick = 'Anonim'
 
         for i in range(self.width):
             for j in range(self.height):
                 cell_temp = i, j
                 self.cell_dict[cell_temp] = empty_cell
+        """
 
-    # настройка внешнего вида
+    def draw_text(self, message, fontsize=28):
+        font = pygame.font.Font(None, fontsize)
+        text = font.render(message, True, (250, 250, 250))
+        text_x = self.width // 2 - text.get_width() // 2
+        text_y = text.get_height() + 10
+        screen.blit(text, (text_x, text_y))
+
     def set_view(self, left, top, cell_size):
         self.left = left
         self.top = top
@@ -83,6 +89,16 @@ class Board:
             cell_coords = 'None'
         # print(cell_coords)
         return cell_coords
+
+    def get_click(self, mouse_pos):
+        cell = self.get_cell(mouse_pos)
+        print(cell)
+        ## self.on_click(cell)
+
+    """
+    
+    
+    
 
     def on_click(self, cell):
         self.color_red = pygame.Color('Red')
@@ -165,86 +181,62 @@ class Board:
             self.win_side = 3
             self.base_event()
             draw_status(self.win_side, self.width, self.height, self.screen)
+    """
 
-    def base_event(self):
-        con = sqlite3.connect("data\\bd.sqlite")
-        cur = con.cursor()
-
-        result = cur.execute("""SELECT *
-                            FROM Base""").fetchall()
-
-        print(self.nick)
-        for i in result:
-            if i[1] == self.nick:
-                if self.win_side == 1:
-                    win = int(i[2])
-                    win += 1
-                    cur.execute("""UPDATE Base
-                                SET Win = ?
-                                WHERE Nickname = ?""", (win, self.nick))
-                    con.commit()
-                if self.win_side == 2:
-                    lose = int(i[3])
-                    lose += 1
-                    cur.execute("""UPDATE Base
-                                SET Lose = ?
-                                WHERE Nickname = ?""", (lose, self.nick))
-                    con.commit()
-                if self.win_side == 3:
-                    draw = int(i[4])
-                    draw += 1
-                    cur.execute("""UPDATE Base
-                                SET Draw = ?
-                                WHERE Nickname = ?""", (draw, self.nick))
-                    con.commit()
-                    print(draw)
-
-
-    def get_click(self, mouse_pos):
-        cell = self.get_cell(mouse_pos)
-        self.on_click(cell)
+    # def base_event(self):
+    #     con = sqlite3.connect("data\\bd.sqlite")
+    #     cur = con.cursor()
+    #
+    #     result = cur.execute("""
+    # SELECT *
+    #                         FROM Base""").fetchall()
+    #
+    #     print(self.nick)
+    #     for i in result:
+    #         if i[1] == self.nick:
+    #             if self.win_side == 1:
+    #                 win = int(i[2])
+    #                 win += 1
+    #                 cur.execute("""UPDATE Base
+    #                             SET Win = ?
+    #                             WHERE Nickname = ?""", (win, self.nick))
+    #                 con.commit()
+    #             if self.win_side == 2:
+    #                 lose = int(i[3])
+    #                 lose += 1
+    #                 cur.execute("""UPDATE Base
+    #                             SET Lose = ?
+    #                             WHERE Nickname = ?""", (lose, self.nick))
+    #                 con.commit()
+    #             if self.win_side == 3:
+    #                 draw = int(i[4])
+    #                 draw += 1
+    #                 cur.execute("""UPDATE Base
+    #                             SET Draw = ?
+    #                             WHERE Nickname = ?""", (draw, self.nick))
+    #                 con.commit()
+    #                 print(draw)
 
 
-def draw_status(win_side, width, height, screen):
-    if win_side == 1:
-        intro_text = ["Крестики выиграли",
-                      "Нажмите любую клавишу,",
-                      "чтобы выйти в меню."]
-    if win_side == 2:
-        intro_text = ["Нолики выиграли",
-                      "Нажмите любую клавишу,",
-                      "чтобы выйти в меню"]
-    if win_side == 3:
-        intro_text = ["Ничья",
-                      "Нажмите любую клавишу,",
-                      "чтобы выйти в меню"]
-    fon = pygame.transform.scale(load_image('fon.jpg'), (width, height))
-    screen.blit(fon, (0, 0))
-    font = pygame.font.Font(None, 40)
-    text_coord = height * 40
-    for line in intro_text:
-        if win_side == 1:
-            string_rendered = font.render(line, 1, pygame.Color('green'))
-        if win_side == 2:
-            string_rendered = font.render(line, 1, pygame.Color('red'))
-        if win_side == 2:
-            string_rendered = font.render(line, 1, pygame.Color('blue'))
-        intro_rect = string_rendered.get_rect()
-        text_coord += 20
-        intro_rect.top = text_coord
-        intro_rect.x = width * 180
-        text_coord += intro_rect.height
-        screen.blit(string_rendered, intro_rect)
-        ev = 0
-    running = True
-    while running:
+# переменные
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.KEYDOWN:
-                start_main_wnd()
-            pygame.display.flip()
+pygame.init()
+pygame.display.set_caption('Крестики нолики')
+game_size = game_width, game_height
+screen = pygame.display.set_mode(game_size)
+mode = 0
+field_size = 3
 
-
-        # start_main_wnd()
+# инициализация класса board
+game = Game(game_width, game_height, screen, mode, field_size)
+# board.set_view(500, 10, 150)
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        # if event.type == pygame.MOUSEBUTTONDOWN:
+        #    board.get_click(event.pos)
+    # screen.fill((0, 0, 0))
+    # board.render(screen)
+    pygame.display.flip()

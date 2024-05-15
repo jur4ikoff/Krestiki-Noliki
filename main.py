@@ -1,18 +1,18 @@
 import sys
 import pygame
 import os
-import Game as game
-import Stata as stata
+# import Game as game
+# import Stata as stata
 import random
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtGui import QPainter, QColor, QPixmap
-from PyQt5 import uic
-from PyQt5.QtWidgets import QMainWindow
-from PyQt5.QtWidgets import QWidget, QApplication, QPushButton, QInputDialog
-from PyQt5.QtWidgets import QCheckBox, QLabel, QLineEdit, QVBoxLayout, QGridLayout
+from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6.QtGui import QPainter, QColor, QPixmap
+from PyQt6 import uic
+from PyQt6.QtWidgets import QMainWindow
+from PyQt6.QtWidgets import QWidget, QApplication, QPushButton, QInputDialog
+from PyQt6.QtWidgets import QCheckBox, QLabel, QLineEdit, QVBoxLayout, QGridLayout
 import sqlite3
 import datetime as dt
-from PyQt5.QtWidgets import QTableWidgetItem, QDialog
+from PyQt6.QtWidgets import QTableWidgetItem, QDialog
 
 pygame.init()
 size = width, height = 1280, 720
@@ -37,7 +37,8 @@ def start_screen():
                   "по вертикали или горизонтали или диагонали",
                   "Для начала нажмите на пробел"]
 
-    fon = pygame.transform.scale(load_image('fon.jpg'), (width, height))
+    fon = pygame.transform.scale(load_image('data.png'), (width, height))
+    # fon = pygame.Color(255, 255, 100)
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 40)
     text_coord = height // 3
@@ -98,8 +99,10 @@ class MainWindow(QMainWindow):
         self.start_game()
 
     def btn3(self):
-        self.go_to_stat()
+        # self.go_to_stat()
+        print("Функция выключена")
 
+    """
     def go_to_stat(self):
         if __name__ == '__main__':
             pygame.init()
@@ -119,6 +122,7 @@ class MainWindow(QMainWindow):
                 # screen.fill((0, 0, 0))
                 pygame.display.flip()
             MainWindow.show(self)
+    """
 
     def nick_proceed(self):
         self.nick = self.lineEdit.text()
@@ -150,6 +154,7 @@ class MainWindow(QMainWindow):
         # for elem in result:
         #    pass
 
+    """
     def start_game(self):
         if __name__ == '__main__':
             pygame.init()
@@ -168,7 +173,7 @@ class MainWindow(QMainWindow):
                 # screen.fill((0, 0, 0))
                 board.render(screen)
                 pygame.display.flip()
-
+    """
 
 def main_wnd():
     if __name__ == '__main__':
@@ -195,4 +200,3 @@ if __name__ == '__main__':
         pygame.display.flip()
         screen.fill((255, 255, 255))
     pygame.quit()
-
