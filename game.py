@@ -1,8 +1,6 @@
 import pygame
 from constrains import game_width, game_height, get_text_gamemode
-import sys
-import os
-from main import run_main_window
+# from main import run_main_window
 
 
 class Game:
@@ -23,8 +21,8 @@ class Game:
         """Запуск всех функций"""
 
         message = get_text_gamemode(self.mode)
-        self.draw_text(f'{message}    Поле {self.field_size}x{self.field_size}', shift_y=10, fontsize=28)
-        self.draw_text("Чтобы выйти нажмите ESC", fontsize=20, shift_y=50)
+        self.draw_text(f'{message}    Поле {self.field_size}x{self.field_size}', shift_y=5, fontsize=36)
+        self.draw_text("Чтобы выйти нажмите ESC", fontsize=28, shift_y=50)
 
         self.cell_size = int(min(self.width, self.height) // (self.field_size + 1.6))
         self.draw_cells()
@@ -220,4 +218,3 @@ class Game:
 #                 run_main_window()
 #
 #     pygame.display.flip()
-#

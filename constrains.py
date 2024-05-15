@@ -1,8 +1,8 @@
 game_width = 800
 game_height = 800
 
-main_width = 1080
-main_height = 720
+WIDTH = 800
+HEIGHT = 800
 
 
 def get_text_gamemode(gamemode: int) -> str:
