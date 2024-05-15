@@ -56,18 +56,35 @@ class Game:
 
     def get_cell(self, mouse_pos):
         """Получение номера клетки по координатам мышки"""
-        print(mouse_pos)
+        is_cell = True
+        x, y = mouse_pos
+
+        if x < self.start_x or x > self.start_x + self.cell_size * self.field_size:
+            is_cell = False
+        if y < self.start_y or y > self.start_y + self.cell_size * self.field_size:
+            is_cell = False
+
+        x -= self.start_x
+        y -= self.start_y
+        i = y // self.cell_size
+        j = x // self.cell_size
+        if is_cell:
+            return i, j
+        return None
 
     def get_click(self, mouse_pos):
-        cell = self.get_cell(mouse_pos)
-        print(cell)
-        ## self.on_click(cell)
+        """ Обработка нажатия """
+        self.cell = self.get_cell(mouse_pos)
+        if self.cell:
+            print(self.cell)
+        self.on_click()
 
+    def on_click(self):
+        pass
+    
+    
+    
     """
-    
-    
-    
-
     def on_click(self, cell):
         self.color_red = pygame.Color('Red')
         self.color_blue = pygame.Color('Blue')
